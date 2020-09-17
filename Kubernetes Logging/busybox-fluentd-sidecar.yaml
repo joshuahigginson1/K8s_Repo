@@ -1,0 +1,40 @@
+# Here, we are creating a busybox-fluentd sidecar pod.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  labels:
+    app: busybox
+spec:
+  volumes:
+  # A volume to store our logs.
+  - name: logs
+    emptyDir: {}
+  # A volume containing our fluentd-config file.
+  - name: fluentd-config
+    configMap:
+      name: fluentd-config
+
+  containers:
+
+  # Busybox is posing as an application that logs an output.
+    -
+  - name: busybox
+    image: busybox
+    command:
+    - '/bin/sh'
+    args: ["-c", "while true; do date 2>&1 | tee -a /tmp/logs/log.txt; sleep 10; done"]
+    volumeMounts:
+    - name: logs
+      mountPath: /tmp/logs
+
+  # Fluentd is being used for data collection.
+
+  - name: fluentd
+    image: bobcrutchley/fluentd-elasticsearch
+    volumeMounts:
+    - name: logs
+      mountPath: /tmp/logs
+    - name: fluentd-config
+      mountPath: /fluentd/etc/

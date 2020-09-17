@@ -1,0 +1,25 @@
+# Configure the Fluentd service running in the Sidecar container.
+# Read from the application log file /tmp/logs/log.txt
+# Send new entries to the Elasticsearch service.
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fluentd-config
+data:
+  fluent.conf: |
+    <source>
+      @type tail
+      path /tmp/logs/log.txt
+      pos_file /tmp/logs/log.txt.pos
+      tag application.logs
+      <parse>
+        @type none
+      </parse>
+    </source>
+    <match *.*>
+      @type elasticsearch
+      host elasticsearch
+      port 9200
+      logstash_format true
+    </match>
