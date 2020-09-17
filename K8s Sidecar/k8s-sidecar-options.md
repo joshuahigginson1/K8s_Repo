@@ -16,4 +16,4 @@ Check the NGINX Logs:
 
 Delete the Pod and ConfigMap that was created by running this command:
 
-`kubectl delete -f pods/jenkins`
+`kubectl delete -f nginx-jenkins-sidecar.yaml`
